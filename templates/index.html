@@ -1,0 +1,45 @@
+<!doctype html>
+
+<!DOCTYPE html>
+<html>
+
+<head>
+	
+	<title></title>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script>window.jQuery || document.write('<script src="{{
+  	url_for('static', filename='jquery.js') }}">\x3C/script>')</script>
+
+</head>
+
+<body>
+
+	<iframe id="frame" src={{ url }} width="560", height="315" frameborder="0" allowfullscreen></iframe>
+	<h1>jQuery Example</h1>
+	<a href=# id=fetch>get urls</a>
+
+</body>
+
+<script type=text/javascript>
+  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+</script>
+
+<script type=text/javascript>
+$(document).ready(
+	function() {
+      $.getJSON($SCRIPT_ROOT + '/_supply_urls', {},
+       function(urls) {
+        var len = urls.length;
+        var iframe = $('#frame');
+        var i = 0;
+        setInterval(function () {
+            iframe.attr('src', urls[++i % len]);
+        }, 10000);
+      });
+      return false;
+    }
+)
+</script>
+
+</html>
+
