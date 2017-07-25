@@ -7,39 +7,75 @@
 	
 	<title></title>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-	<script>window.jQuery || document.write('<script src="{{
-  	url_for('static', filename='jquery.js') }}">\x3C/script>')</script>
+	<script>window.jQuery || document.write('<script src="{{ url_for('static', filename='jquery.js') }}">\x3C/script>')</script>
+  <script src="http://www.youtube.com/player_api"></script>
 
 </head>
 
 <body>
 
-	<iframe id="frame" src={{ url }} width="560", height="315" frameborder="0" allowfullscreen></iframe>
-	<h1>jQuery Example</h1>
-	<a href=# id=fetch>get urls</a>
+<div id="player"></div>
 
-</body>
 
-<script type=text/javascript>
-  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-</script>
+
 
 <script type=text/javascript>
+$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+
+
+
+window.cur_vid_index = 3;
+window.onYouTubePlayerAPIReady = function() {
+  console.log(window.videos[window.cur_vid_index]['id']['videoId'])
+  player = new YT.Player('player', {
+    height: '390',
+    width: '640',
+    videoId: window.videos[window.cur_vid_index]['id']['videoId'],
+    events: {
+      'onReady': window.onPlayerReady,
+      'onStateChange': window.onPlayerStateChange
+    },
+    playerVars:{
+      start:0,
+      end: window.videos[window.cur_vid_index]['end_seconds']
+    }
+  });
+}
+
+// autoplay video
+window.onPlayerReady =function (event) {
+    event.target.playVideo();
+}
+
+// when video ends
+window.onPlayerStateChange = function(event) { 
+    window.cur_vid_index = (window.cur_vid_index + 1)%window.videos.length;       
+    if(event.data === 0) {
+        player.loadVideoById({
+          videoId:videos[window.cur_vid_index]['id']['videoId'],
+          endSeconds:videos[window.cur_vid_index]['end_seconds']});
+        
+    }
+}
+
 $(document).ready(
-	function() {
-      $.getJSON($SCRIPT_ROOT + '/_supply_urls', {},
-       function(urls) {
-        var len = urls.length;
-        var iframe = $('#frame');
-        var i = 0;
-        setInterval(function () {
-            iframe.attr('src', urls[++i % len]);
-        }, 10000);
+  function() {
+      $.getJSON($SCRIPT_ROOT + '/_supply_videos', {},
+       function(videos) {
+        console.log(videos)
+        window.videos = videos;
+
+        window.onYouTubePlayerAPIReady();
       });
       return false;
     }
 )
 </script>
+
+
+</body>
+
+
 
 </html>
 

@@ -51,12 +51,26 @@ class YoutubePomodoro:
 		self.processVideos(productive_videos,self.productive_duration)
 		self.processVideos(break_videos,self.break_duration)
 
-		return productive_videos,break_videos
+		videos = self.mergeLists(productive_videos,break_videos)
+
+		return videos
 
 	def processVideos(self,videos,duration):
 		self.fetchVideoDuration(videos)
 		self.removeTooShort(videos,duration)
-		self.addLinks(videos,duration)
+		self.addDetails(videos,duration)
+
+	def mergeLists(self,videos1,videos2):
+		length1 = len(videos1)
+		length2 = len(videos2)
+		shorter_length = min(length1,length2)
+
+		videos = []
+		for i in range(shorter_length):
+			videos.append(videos1[i])
+			videos.append(videos2[i])
+
+		return videos
 
 	def fetchVideoDuration(self,videos):
 		for video in videos:
@@ -76,7 +90,7 @@ class YoutubePomodoro:
 		temp = [video for video in videos if video['duration'] >= duration]
 		videos = temp
 
-	def addLinks(self,videos,duration):
+	def addDetails(self,videos,duration):
 		for video in videos:
 			video_id = video['id']['videoId']
 
@@ -85,6 +99,7 @@ class YoutubePomodoro:
 
 			video['embed_url'] = embed_url
 			video['watch_url'] = watch_url
+			video['end_seconds'] = duration*60
 
 	def buildVideoQueryStr(self,user_query):
 		query = self.handleSpaces(user_query)
