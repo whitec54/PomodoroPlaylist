@@ -11,7 +11,7 @@ class YoutubePomodoro:
 		self.embed_base = "https://www.youtube.com/embed/"
 		self.watch_base = "https://www.youtube.com/watch?v="
 
-	def getUserPrefs(self):
+	def fetchUserPrefs(self):
 		music_options = ['lofi','classical','edm']
 		duration_options = [5,10,15,20,25,30,35,40,45,50,55,60]
 
@@ -33,6 +33,11 @@ class YoutubePomodoro:
 
 		self.break_duration = duration_options[int(input("enter a number: "))]
 
+	def setUserPrefs(self,user_args):
+		self.music_type = user_args['genre']
+		self.productive_duration = int(user_args['productive'])
+		self.break_duration = int(user_args['break'])
+
 	def getVideos(self):
 		if not self.music_type:
 			print("Needs user prefs")
@@ -43,7 +48,7 @@ class YoutubePomodoro:
 		productive_response = productive_response.json()
 		productive_videos = productive_response["items"]
 
-		break_url = self.buildVideoQueryStr('rocket league gameplay')
+		break_url = self.buildVideoQueryStr('h3h3')
 		break_response = requests.get(break_url)
 		break_response = break_response.json()
 		break_videos = break_response["items"]

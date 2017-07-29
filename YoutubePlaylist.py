@@ -1,12 +1,20 @@
 from flask import Flask, jsonify, render_template, request,json
+from main import YoutubePomodoro
 
 app = Flask(__name__)
 
-@app.route('/_supply_videos')
+@app.route('/_supply_videos', methods=['GET','POST'])
 def supply_videos():
-	with open('videos.json') as infile:    
-		videos = json.load(infile)
-		return jsonify(videos)
+	yt = YoutubePomodoro()
+	yt.setUserPrefs(request.args)
+	videos = yt.getVideos()
+
+	for video in videos:
+		print(video['snippet']['title'])
+
+
+
+	return jsonify(videos)
 
 @app.route('/')
 def index():
@@ -14,14 +22,6 @@ def index():
 
 	return render_template('index.html', url=url)
 
-@app.route('/desiredPomodoro', methods=['GET','POST'])
-def desiredPomodoro():
-	if request.method == 'POST':
-		genre = request.json.get('genre')
-		return genre
-
-	else:
-		return render_template('index.html')
 
 if __name__ == "__main__":
 	app.run(debug=True)

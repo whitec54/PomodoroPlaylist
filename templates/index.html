@@ -22,7 +22,7 @@ $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 
 
 
-window.cur_vid_index = 3;
+window.cur_vid_index = 2;
 window.onYouTubePlayerAPIReady = function() {
   console.log(window.videos[window.cur_vid_index]['id']['videoId'])
   player = new YT.Player('player', {
@@ -34,7 +34,7 @@ window.onYouTubePlayerAPIReady = function() {
       'onStateChange': window.onPlayerStateChange
     },
     playerVars:{
-      start:0,
+      start:1,
       end: window.videos[window.cur_vid_index]['end_seconds']
     }
   });
@@ -56,18 +56,35 @@ window.onPlayerStateChange = function(event) {
     }
 }
 
-$(document).ready(
-  function() {
-      $.getJSON($SCRIPT_ROOT + '/_supply_videos', {},
-       function(videos) {
-        console.log(videos)
-        window.videos = videos;
 
-        window.onYouTubePlayerAPIReady();
-      });
-      return false;
-    }
-)
+var getVideos = function() {
+  alert("get vids")
+  var selectedGenre = document.getElementById("genre").value;
+  var selectedProductive = document.getElementById("productiveTime").value;
+  var selectedBreak = document.getElementById("breakTime").value;
+
+  var desiredPomodoro = {
+    genre: '',
+    productive: '',
+    break: ''
+  };
+
+  desiredPomodoro['genre'] = selectedGenre;
+  desiredPomodoro['productive'] = selectedProductive;
+  desiredPomodoro['break'] = selectedBreak;
+
+
+  $.getJSON($SCRIPT_ROOT + '/_supply_videos', desiredPomodoro,
+   function(videos) {
+    console.log(videos)
+    window.videos = videos;
+
+    window.onYouTubePlayerAPIReady();
+  });
+
+  return false;
+}
+
 </script>
 
 <br/><br/>
@@ -83,61 +100,27 @@ $(document).ready(
 
   <label for="productiveTime">Productive</label>
   <select id="productiveTime">
-    <option value="5min">5 minutes</option>
-    <option value="10min">10 minutes</option>
-    <option value="15min">15 minutes</option>
-    <option value="20min">20 minutes</option>
-    <option value="25min">25 minutes</option>
-    <option value="30min">30 minutes</option>
+    <option value="5">5 minutes</option>
+    <option value="10">10 minutes</option>
+    <option value="15">15 minutes</option>
+    <option value="20">20 minutes</option>
+    <option value="25">25 minutes</option>
+    <option value="30">30 minutes</option>
   </select>
 
   <label for="breakTime">Break</label>
   <select id="breakTime">
-    <option value="5min">5 minutes</option>
-    <option value="10min">10 minutes</option>
-    <option value="15min">15 minutes</option>
-    <option value="20min">20 minutes</option>
-    <option value="25min">25 minutes</option>
-    <option value="30min">30 minutes</option>
+    <option value="5">5 minutes</option>
+    <option value="10">10 minutes</option>
+    <option value="15">15 minutes</option>
+    <option value="20">20 minutes</option>
+    <option value="25">25 minutes</option>
+    <option value="30">30 minutes</option>
   </select>
 
-  <input type="submit" value="Submit" onclick="return userInputToJSON();"/>
+  <input type="submit" value="Submit" onclick="return getVideos();"/>
  
 </form>
-
-<script>
-  function userInputToJSON(){
-    var selectedGenre = document.getElementById("genre").value;
-    var selectedProductive = document.getElementById("productiveTime").value;
-    var selectedBreak = document.getElementById("breakTime").value;
-
-    var desiredPomodoro = {
-      genre: '',
-      productive: '',
-      break: ''
-    };
-
-    desiredPomodoro['genre'] = selectedGenre;
-    desiredPomodoro['productive'] = selectedProductive;
-    desiredPomodoro['break'] = selectedBreak;
-
-    var jsonString = JSON.stringify(desiredPomodoro);
-    alert(jsonString);
-    
-    $.ajax({
-      type: 'POST',
-      url: '/desiredPomodoro',
-      data: jsonString,
-      dataType: 'json',
-      contentType: 'application/json;charset=UTF-8',
-      success: function(e){
-        alert("Success???");
-      }
-    });
-    
-  }
-
-</script>
 
 </body>
 
