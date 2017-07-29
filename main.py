@@ -112,4 +112,11 @@ class YoutubePomodoro:
 		user_query = user_query.replace(" ","+")
 		return user_query
 
+	def createJSON(self):
+		self.getUserPrefs()
+		
 
+
+if __name__ == "__main__":
+	test = YoutubePomodoro()
+	test.createJSON()

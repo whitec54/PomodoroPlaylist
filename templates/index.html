@@ -17,8 +17,6 @@
 <div id="player"></div>
 
 
-
-
 <script type=text/javascript>
 $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 
@@ -72,10 +70,72 @@ $(document).ready(
 )
 </script>
 
+<br/><br/>
+
+<form>
+
+  <label for="genre">Genre</label>
+  <select id="genre">
+    <option value="lofi">Lofi</option>
+    <option value="edm">EDM</option>
+    <option value="classical">Classical</option>
+  </select>
+
+  <label for="productiveTime">Productive</label>
+  <select id="productiveTime">
+    <option value="5min">5 minutes</option>
+    <option value="10min">10 minutes</option>
+    <option value="15min">15 minutes</option>
+    <option value="20min">20 minutes</option>
+    <option value="25min">25 minutes</option>
+    <option value="30min">30 minutes</option>
+  </select>
+
+  <label for="breakTime">Break</label>
+  <select id="breakTime">
+    <option value="5min">5 minutes</option>
+    <option value="10min">10 minutes</option>
+    <option value="15min">15 minutes</option>
+    <option value="20min">20 minutes</option>
+    <option value="25min">25 minutes</option>
+    <option value="30min">30 minutes</option>
+  </select>
+
+  <input type="submit" value="Submit" onclick="return userInputToJSON();"/>
+ 
+</form>
+
+<script>
+  function userInputToJSON(){
+    var selectedGenre = document.getElementById("genre").value;
+    var selectedProductive = document.getElementById("productiveTime").value;
+    var selectedBreak = document.getElementById("breakTime").value;
+
+    var desiredPomodoro = {
+      genre: '',
+      productive: '',
+      break: ''
+    };
+
+    desiredPomodoro['genre'] = selectedGenre;
+    desiredPomodoro['productive'] = selectedProductive;
+    desiredPomodoro['break'] = selectedBreak;
+
+    //var jsonString = JSON.stringify(desiredPomodoro);
+
+    $.ajax({
+      type: 'POST',
+      url: window.location.href,
+      data: jSON.stringify(desiredPomodoro)
+      dataType: 'json',
+      success: function(e){
+        alert("Success???");
+      }
+    });
+  }
+
+</script>
 
 </body>
 
-
-
 </html>
-
