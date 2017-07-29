@@ -14,5 +14,14 @@ def index():
 
 	return render_template('index.html', url=url)
 
+@app.route('/desiredPomodoro', methods=['GET','POST'])
+def desiredPomodoro():
+	if request.method == 'POST':
+		genre = request.json.get('genre')
+		return genre
+
+	else:
+		return render_template('index.html')
+
 if __name__ == "__main__":
 	app.run(debug=True)

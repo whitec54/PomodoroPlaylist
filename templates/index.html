@@ -121,17 +121,20 @@ $(document).ready(
     desiredPomodoro['productive'] = selectedProductive;
     desiredPomodoro['break'] = selectedBreak;
 
-    //var jsonString = JSON.stringify(desiredPomodoro);
-
+    var jsonString = JSON.stringify(desiredPomodoro);
+    alert(jsonString);
+    
     $.ajax({
       type: 'POST',
-      url: window.location.href,
-      data: jSON.stringify(desiredPomodoro)
+      url: '/desiredPomodoro',
+      data: jsonString,
       dataType: 'json',
+      contentType: 'application/json;charset=UTF-8',
       success: function(e){
         alert("Success???");
       }
     });
+    
   }
 
 </script>
