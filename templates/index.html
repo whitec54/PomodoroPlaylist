@@ -1,127 +1,223 @@
 <!doctype html>
-
-<!DOCTYPE html>
 <html>
+	<head>
+		<title></title>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script>window.jQuery || document.write('<script src="{{ url_for('static', filename='jquery.js') }}">\x3C/script>')</script>
+	  <script src="http://www.youtube.com/player_api"></script>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.5.0/css/bulma.min.css" />
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+		<style>
+		.videoWrapper {
+			position: relative;
+			padding-bottom: 56.25%; /* 16:9 */
+			padding-top: 25px;
+			height: 0;
+		}
+		.videoWrapper iframe {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+		}
+		</style>
+	</head>
 
-<head>
-	
-	<title></title>
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-	<script>window.jQuery || document.write('<script src="{{ url_for('static', filename='jquery.js') }}">\x3C/script>')</script>
-  <script src="http://www.youtube.com/player_api"></script>
+	<body>
 
-</head>
+		<!-- <div id="player"></div> -->
 
-<body>
+		<section class="hero">
+			<div class="hero-body">
+				<div class="container">
+					<h1 class="title">
+						Youtube Pomodoro
+					</h1>
+					<h2 class="subtitle">
+						Create a youtube playlist according to your pomodoro cycle
+					</h2>
+				</div>
+			</div>
+		</section>
+		<section class="section" id="video" style="display:none;">
+			<div class="container">
+				<div class="card">
+					<header class="card-header">
+						<p class="card-header-title">
+							Video
+						</p>
+					</header>
+					<div class="card-content">
+						<div class="videoWrapper">
+							<div id="player">
+								<p>Select options below to get started.</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<section class="section">
+			<div class="container">
+				<form>
+					<div class="card">
+						<header class="card-header">
+							<p class="card-header-title">
+								Options
+							</p>
+						</header>
+						<div class="card-content">
+							<div class="content">
+								<div class="columns">
+									<div class="column">
+										<div class="field">
+											<label for="genre" class="label">Genre</label>
+											<div class="control">
+												<div class="select">
+													<select id="genre" class="input">
+														<option value="lofi">Lofi</option>
+														<option value="edm">EDM</option>
+														<option value="classical">Classical</option>
+													</select>
+												</div>
 
-<div id="player"></div>
+											</div>
+										</div>
+									</div>
+									<div class="column">
+										<div class="field">
+											<label for="productiveTime" class="label">Productive</label>
+											<div class="control">
+												<div class="select">
+													<select id="productiveTime" class="input">
+														<option value="5">5 minutes</option>
+														<option value="10">10 minutes</option>
+														<option value="15">15 minutes</option>
+														<option value="20">20 minutes</option>
+														<option value="25">25 minutes</option>
+														<option value="30">30 minutes</option>
+													</select>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="column">
+										<div class="field">
+											<label for="breakTime" class="label">Break</label>
+											<div class="control">
+												<div class="select">
+													<select id="breakTime" class="input">
+														<option value="5">5 minutes</option>
+														<option value="10">10 minutes</option>
+														<option value="15">15 minutes</option>
+														<option value="20">20 minutes</option>
+														<option value="25">25 minutes</option>
+														<option value="30">30 minutes</option>
+													</select>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<footer class="card-footer">
+							<a class="card-footer-item" onclick="return getVideos();">Submit</a>
+						</footer>
+					</div>
+				</form>
+
+			</div>
+		</section>
+
+		<footer class="footer">
+		  <div class="container">
+		    <div class="content has-text-centered">
+		      <p>
+		        <strong>YoutubePomodoro</strong> by <a href="http://camwhite.io">Cameron White</a>. The source code is licensed
+		        <a href="http://opensource.org/licenses/mit-license.php">MIT</a>. The website content
+		        is licensed <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC ANS 4.0</a>.
+		      </p>
+		      <p>
+		        <a class="icon" href="https://github.com/whitec54/PomodoroPlaylist">
+		          <i class="fa fa-github"></i>
+		        </a>
+		      </p>
+		    </div>
+		  </div>
+		</footer>
 
 
-<script type=text/javascript>
-$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+		<script type=text/javascript>
+		$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+		window.cur_vid_index = 2;
+		window.onYouTubePlayerAPIReady = function() {
+			console.log(window.videos[window.cur_vid_index]['id']['videoId'])
+			player = new YT.Player('player', {
+				height: '390',
+				width: '640',
+				videoId: window.videos[window.cur_vid_index]['id']['videoId'],
+				events: {
+					'onReady': window.onPlayerReady,
+					'onStateChange': window.onPlayerStateChange
+				},
+				playerVars:{
+					start:1,
+					end: window.videos[window.cur_vid_index]['end_seconds']
+				}
+			});
+		}
+
+		// autoplay video
+		window.onPlayerReady =function (event) {
+			event.target.playVideo();
+		}
+
+		// when video ends
+		window.onPlayerStateChange = function(event) {
+			window.cur_vid_index = (window.cur_vid_index + 1)%window.videos.length;
+			if(event.data === 0) {
+				player.loadVideoById({
+					videoId:videos[window.cur_vid_index]['id']['videoId'],
+					endSeconds:videos[window.cur_vid_index]['end_seconds']});
+
+				}
+			}
 
 
-
-window.cur_vid_index = 2;
-window.onYouTubePlayerAPIReady = function() {
-  console.log(window.videos[window.cur_vid_index]['id']['videoId'])
-  player = new YT.Player('player', {
-    height: '390',
-    width: '640',
-    videoId: window.videos[window.cur_vid_index]['id']['videoId'],
-    events: {
-      'onReady': window.onPlayerReady,
-      'onStateChange': window.onPlayerStateChange
-    },
-    playerVars:{
-      start:1,
-      end: window.videos[window.cur_vid_index]['end_seconds']
-    }
-  });
-}
-
-// autoplay video
-window.onPlayerReady =function (event) {
-    event.target.playVideo();
-}
-
-// when video ends
-window.onPlayerStateChange = function(event) { 
-    window.cur_vid_index = (window.cur_vid_index + 1)%window.videos.length;       
-    if(event.data === 0) {
-        player.loadVideoById({
-          videoId:videos[window.cur_vid_index]['id']['videoId'],
-          endSeconds:videos[window.cur_vid_index]['end_seconds']});
-        
-    }
-}
+			var getVideos = function() {
+				alert("get vids")
+				var selectedGenre = document.getElementById("genre").value;
+				var selectedProductive = document.getElementById("productiveTime").value;
+				var selectedBreak = document.getElementById("breakTime").value;
 
 
-var getVideos = function() {
-  alert("get vids")
-  var selectedGenre = document.getElementById("genre").value;
-  var selectedProductive = document.getElementById("productiveTime").value;
-  var selectedBreak = document.getElementById("breakTime").value;
+				var desiredPomodoro = {
+					genre: '',
+					productive: '',
+					break: ''
+				};
 
-  var desiredPomodoro = {
-    genre: '',
-    productive: '',
-    break: ''
-  };
-
-  desiredPomodoro['genre'] = selectedGenre;
-  desiredPomodoro['productive'] = selectedProductive;
-  desiredPomodoro['break'] = selectedBreak;
+				desiredPomodoro['genre'] = selectedGenre;
+				desiredPomodoro['productive'] = selectedProductive;
+				desiredPomodoro['break'] = selectedBreak;
 
 
-  $.getJSON($SCRIPT_ROOT + '/_supply_videos', desiredPomodoro,
-   function(videos) {
-    console.log(videos)
-    window.videos = videos;
+				$.getJSON($SCRIPT_ROOT + '/_supply_videos', desiredPomodoro,
+				function(videos) {
+					console.log(videos)
+					window.videos = videos;
+					document.getElementById('video').style.display = "block";
 
-    window.onYouTubePlayerAPIReady();
-  });
+					window.onYouTubePlayerAPIReady();
+				});
 
-  return false;
-}
+				return false;
+			}
 
-</script>
+		</script>
 
-<br/><br/>
-
-<form>
-
-  <label for="genre">Genre</label>
-  <select id="genre">
-    <option value="lofi">Lofi</option>
-    <option value="edm">EDM</option>
-    <option value="classical">Classical</option>
-  </select>
-
-  <label for="productiveTime">Productive</label>
-  <select id="productiveTime">
-    <option value="5">5 minutes</option>
-    <option value="10">10 minutes</option>
-    <option value="15">15 minutes</option>
-    <option value="20">20 minutes</option>
-    <option value="25">25 minutes</option>
-    <option value="30">30 minutes</option>
-  </select>
-
-  <label for="breakTime">Break</label>
-  <select id="breakTime">
-    <option value="5">5 minutes</option>
-    <option value="10">10 minutes</option>
-    <option value="15">15 minutes</option>
-    <option value="20">20 minutes</option>
-    <option value="25">25 minutes</option>
-    <option value="30">30 minutes</option>
-  </select>
-
-  <input type="submit" value="Submit" onclick="return getVideos();"/>
- 
-</form>
-
-</body>
+	</body>
 
 </html>
